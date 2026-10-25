@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kalkulator Receptur Deserów</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --rose-50: #fff1f2;
+  --rose-100: #ffe4e6;
+  --rose-200: #fecdd3;
+  --rose-300: #fda4af;
+  --rose-400: #fb7185;
+  --rose-500: #f43f5e;
+  --rose-600: #e11d48;
+  --rose-700: #be123c;
+  --plum-50: #fdf4ff;
+  --plum-100: #fae8ff;
+  --plum-200: #f0abfc;
+  --plum-500: #a855f7;
+  --peach-50: #fff7ed;
+  --peach-100: #ffedd5;
+  --peach-200: #fed7aa;
+  --peach-300: #fdba74;
+  --peach-500: #f97316;
+  --bg: #faf8f6;
+  --card: #ffffff;
+  --text: #1c1017;
+  --text-secondary: #78716c;
+  --border: #e7e5e4;
+  --border-light: #f5f5f4;
+  --shadow: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.05);
+  --shadow-lg: 0 10px 25px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.05);
+  --radius: 16px;
+  --radius-sm: 10px;
+  --radius-xs: 8px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--rose-200); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: var(--rose-300); }
+
+/* ===== TOP NAV ===== */
+.top-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 32px;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 50;
+}
+.top-nav-left { display: flex; align-items: center; gap: 14px; }
+.logo-icon {
+  width: 42px; height: 42px;
+  background: linear-gradient(135deg, var(--rose-400), var(--rose-600));
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  color: white; font-size: 20px;
+  box-shadow: 0 4px 12px rgba(244,63,94,0.3);
+}
+.top-nav h1 { font-size: 18px; font-weight: 800; color: var(--text); letter-spacing: -0.3px; }
+.top-nav-tabs {
+  display: flex; background: var(--border-light); border-radius: 100px; padding: 3px;
+}
+.top-nav-tab {
+  padding: 8px 20px; border-radius: 100px; font-size: 13px; font-weight: 600;
+  color: var(--text-secondary); cursor: pointer; border: none; background: none;
+  transition: all 0.2s; font-family: inherit;
+}
+.top-nav-tab.active {
+  background: var(--rose-500); color: white;
+  box-shadow: 0 2px 8px rgba(244,63,94,0.3);
+}
+.top-nav-tab:not(.active):hover { color: var(--text); background: white; }
+.top-nav-right { display: flex; align-items: center; gap: 10px; }
+.search-box {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--border-light); border-radius: 100px; padding: 8px 16px; width: 240px;
+  transition: all 0.2s; border: 1px solid transparent;
+}
+.search-box:focus-within { background: white; border-color: var(--rose-200); box-shadow: 0 0 0 3px var(--rose-50); }
+.search-box input { border: none; background: none; outline: none; font-size: 13px; font-family: inherit; width: 100%; color: var(--text); }
+.search-box svg { flex-shrink: 0; color: var(--text-secondary); }
+
+/* ===== VIEWS ===== */
+.view { display: none; }
+.view.active { display: block; }
+
+/* ===== MAIN ===== */
+.main { padding: 24px 32px; max-width: 1440px; margin: 0 auto; }
+
+/* ===== SUMMARY CARDS ===== */
+.summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 20px; }
+.summary-card {
+  background: var(--card); border-radius: var(--radius); padding: 20px 22px;
+  box-shadow: var(--shadow); border: 1px solid var(--border); position: relative; overflow: hidden;
+}
+.summary-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--rose-300), var(--rose-500));
+}
+.summary-card.accent {
+  background: linear-gradient(135deg, var(--rose-50) 0%, var(--rose-100) 100%);
+  border: 1px solid var(--rose-200);
+}
+.summary-card.accent::before {
+  background: linear-gradient(90deg, var(--rose-400), var(--rose-600));
+  height: 4px;
+}
+.sc-label { font-size: 12px; color: var(--text-secondary); font-weight: 600; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+.sc-value { font-size: 28px; font-weight: 800; color: var(--text); letter-spacing: -1px; }
+.summary-card.accent .sc-value { color: var(--rose-700); }
+.sc-sub { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+
+/* ===== DESSERT TABS & SELECTOR BAR ===== */
+.dessert-tabs-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+  background: var(--card);
+  padding: 8px 12px;
+  border-radius: 100px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  overflow-x: auto;
+}
+.dessert-tabs-scroll {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 2px 0;
+  scrollbar-width: none; /* Firefox */
+}
+.dessert-tabs-scroll::-webkit-scrollbar { display: none; }
+.dessert-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px;
+  border-radius: 100px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: inherit;
+}
+.dessert-tab-btn:hover {
+  color: var(--text);
+  background: var(--rose-50);
+}
+.dessert-tab-btn.active {
+  background: linear-gradient(135deg, var(--rose-500), var(--rose-600));
+  color: white;
+  border-color: transparent;
+  box-shadow: 0 3px 12px rgba(244,63,94,0.32);
+  transform: translateY(-1px);
+}
+.dessert-tab-btn .tab-badge {
+  background: rgba(255,255,255,0.25);
+  font-size: 11px;
+  padding: 1px 7px;
+  border-radius: 100px;
+  font-weight: 700;
+}
+.dessert-tab-btn:not(.active) .tab-badge {
+  background: var(--border-light);
+  color: var(--text-secondary);
+}
+.dessert-tab-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: 600;
+  background: var(--rose-100);
+  color: var(--rose-700);
+  border: 1px dashed var(--rose-300);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+  font-family: inherit;
+  flex-shrink: 0;
+}
+.dessert-tab-add:hover {
+  background: var(--rose-200);
+  border-color: var(--rose-400);
+  transform: translateY(-1px);
+}
+
+/* Quick Select Dropdown for Mobile / Direct Jump */
+.dessert-dropdown-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  padding-left: 8px;
+  border-left: 1px solid var(--border);
+}
+.dessert-select-box {
+  padding: 7px 12px;
+  border-radius: 100px;
+  border: 1px solid var(--border);
+  background: white;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  color: var(--text);
+  outline: none;
+  cursor: pointer;
+}
+.dessert-select-box:focus {
+  border-color: var(--rose-400);
+  box-shadow: 0 0 0 2px var(--rose-100);
+}
+
+/* ===== TOOLBAR ===== */
+.toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 8px; }
+.toolbar-left { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 9px 18px; border-radius: 100px; font-size: 13px; font-weight: 600;
+  font-family: inherit; cursor: pointer; transition: all 0.2s; border: none; white-space: nowrap;
+}
+.btn-primary { background: var(--rose-500); color: white; box-shadow: 0 2px 8px rgba(244,63,94,0.25); }
+.btn-primary:hover { background: var(--rose-600); box-shadow: 0 4px 14px rgba(244,63,94,0.35); transform: translateY(-1px); }
+.btn-secondary { background: var(--card); color: var(--text); border: 1px solid var(--border); }
+.btn-secondary:hover { background: var(--border-light); }
+.btn-danger { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+.btn-danger:hover { background: #fee2e2; }
+.btn-sm { padding: 6px 14px; font-size: 12px; }
+.btn-xs { padding: 4px 10px; font-size: 11px; border-radius: 6px; }
+.btn-plum { background: var(--plum-100); color: #7c3aed; border: 1px solid var(--plum-200); }
+.btn-plum:hover { background: #f3e8ff; }
+.btn-peach { background: var(--peach-100); color: #c2410c; border: 1px solid var(--peach-300); }
+.btn-peach:hover { background: var(--peach-50); }
+
+/* ===== TABLE CARD ===== */
+.table-card {
+  background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow-md);
+  border: 1px solid var(--border); overflow: hidden; margin-bottom: 20px;
+}
+.tc-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 22px; border-bottom: 1px solid var(--border);
+  background: linear-gradient(135deg, var(--rose-50) 0%, #fff5f7 50%, var(--plum-50) 100%);
+  flex-wrap: wrap; gap: 10px;
+}
+.tc-header-left { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.dessert-icon {
+  width: 44px; height: 44px;
+  background: linear-gradient(135deg, var(--rose-400), var(--rose-500));
+  border-radius: 12px; display: flex; align-items: center; justify-content: center;
+  font-size: 22px; box-shadow: 0 2px 8px rgba(244,63,94,0.25); flex-shrink: 0;
+}
+.dessert-name-input {
+  font-size: 19px; font-weight: 800; color: var(--text);
+  border: none; background: none; outline: none; padding: 2px 0;
+  border-bottom: 2px solid transparent; font-family: inherit; transition: border-color 0.2s;
+  min-width: 140px; max-width: 260px;
+}
+.dessert-name-input:focus { border-bottom-color: var(--rose-400); }
+.prod-badge {
+  display: flex; align-items: center; gap: 6px;
+  background: white; border: 1px solid var(--border); border-radius: 100px;
+  padding: 5px 6px 5px 14px; font-size: 12.5px; font-weight: 500; color: var(--text-secondary);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+}
+.prod-input {
+  width: 76px; padding: 5px 10px; border: none; border-radius: 100px;
+  background: var(--rose-100); font-size: 13.5px; font-weight: 700; color: var(--rose-700);
+  text-align: center; outline: none; font-family: inherit; transition: all 0.2s;
+}
+.prod-input:focus { background: var(--rose-200); box-shadow: 0 0 0 2px var(--rose-300); }
+.tc-header-right { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+
+/* ===== TABLE ===== */
+.table-scroll { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; min-width: 860px; }
+thead th {
+  position: sticky; top: 0; z-index: 2; background: #fafaf9;
+  border-bottom: 2px solid var(--border); padding: 11px 14px;
+  font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px;
+  color: var(--text-secondary); text-align: left; white-space: nowrap;
+}
+.col-letter {
+  display: inline-block; width: 18px; height: 18px; line-height: 18px; text-align: center;
+  background: var(--rose-100); color: var(--rose-600); border-radius: 5px;
+  font-size: 9.5px; font-weight: 800; margin-right: 5px;
+}
+tbody tr { transition: background 0.12s; }
+tbody tr:hover { background: var(--rose-50); }
+tbody td {
+  padding: 10px 14px; border-bottom: 1px solid var(--border-light);
+  font-size: 13.5px; color: var(--text); vertical-align: middle;
+}
+.cell-editable { cursor: text; position: relative; }
+.cell-editable:hover { background: #fff5f7; outline: 2px solid var(--rose-200); outline-offset: -2px; border-radius: 4px; }
+.cell-editable:focus-within { background: white; outline: 2px solid var(--rose-400); outline-offset: -2px; border-radius: 4px; }
+.cell-input {
+  border: none; background: none; outline: none; font-size: 13.5px; font-family: inherit;
+  color: var(--text); width: 100%; padding: 0;
+}
+.cell-input.num { font-variant-numeric: tabular-nums; font-weight: 500; text-align: right; }
+.cell-input::placeholder { color: #d6d3d1; }
+.cell-readonly { font-variant-numeric: tabular-nums; font-weight: 600; }
+.cell-cost { color: var(--rose-700); font-weight: 700; }
+.cell-unit { color: var(--text-secondary); font-size: 11.5px; margin-left: 2px; }
+.row-num { color: var(--text-secondary); font-size: 12.5px; font-weight: 500; width: 36px; text-align: center; }
+.del-btn {
+  opacity: 0; transition: opacity 0.12s; background: none; border: none; color: #ef4444;
+  cursor: pointer; padding: 5px; border-radius: 6px; display: flex; align-items: center; justify-content: center;
+}
+tbody tr:hover .del-btn { opacity: 1; }
+.del-btn:hover { background: #fef2f2; }
+
+/* ===== COST FOOTER ===== */
+.cost-footer {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 0;
+  border-top: 2px solid var(--rose-200); background: linear-gradient(135deg, var(--rose-50), #fff5f7);
+}
+.cost-footer-item {
+  padding: 18px 24px; text-align: center;
+  border-right: 1px solid var(--rose-100);
+}
+.cost-footer-item:last-child { border-right: none; }
+.cf-label { font-size: 11.5px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+.cf-value { font-size: 24px; font-weight: 800; color: var(--rose-700); letter-spacing: -0.5px; }
+.cf-sub { font-size: 11.5px; color: var(--text-secondary); margin-top: 2px; }
+
+/* ===== UNIT SELECT ===== */
+.unit-select {
+  padding: 4px 6px; border: 1px solid var(--border); border-radius: 6px;
+  font-size: 11.5px; font-family: inherit; background: white; color: var(--text); outline: none; cursor: pointer;
+}
+.unit-select:focus { border-color: var(--rose-400); box-shadow: 0 0 0 2px var(--rose-50); }
+
+/* ===== EMPTY STATE ===== */
+.empty-state { text-align: center; padding: 80px 40px; }
+.empty-state-icon { font-size: 64px; margin-bottom: 16px; }
+.empty-state h3 { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+.empty-state p { color: var(--text-secondary); margin-bottom: 24px; font-size: 14px; }
+
+/* ===== MODAL ===== */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(28,16,23,0.45); backdrop-filter: blur(6px);
+  z-index: 100; display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none; transition: opacity 0.2s;
+}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal {
+  background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow-lg);
+  padding: 28px 32px; width: 500px; max-width: 92vw; max-height: 90vh; overflow-y: auto;
+  transform: translateY(20px) scale(0.97); transition: transform 0.25s;
+}
+.modal-overlay.open .modal { transform: translateY(0) scale(1); }
+.modal h2 { font-size: 18px; font-weight: 700; margin-bottom: 18px; display: flex; align-items: center; gap: 10px; }
+.modal-field { margin-bottom: 14px; position: relative; }
+.modal-field label { display: block; font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.3px; }
+.modal-field input, .modal-field select {
+  width: 100%; padding: 9px 13px; border: 1px solid var(--border); border-radius: var(--radius-xs);
+  font-size: 13px; font-family: inherit; outline: none; transition: all 0.2s;
+}
+.modal-field input:focus, .modal-field select:focus { border-color: var(--rose-400); box-shadow: 0 0 0 3px var(--rose-50); }
+.modal-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
+
+/* ===== WAREHOUSE TABLE ===== */
+.wh-table { width: 100%; border-collapse: collapse; }
+.wh-table th {
+  text-align: left; padding: 10px 14px; font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary);
+  border-bottom: 2px solid var(--border); background: #fafaf9;
+}
+.wh-table td { padding: 10px 14px; border-bottom: 1px solid var(--border-light); font-size: 13px; }
+.wh-table tbody tr:hover { background: var(--rose-50); }
+.wh-input {
+  border: none; background: none; outline: none; font-size: 13px; font-family: inherit;
+  color: var(--text); width: 100%; padding: 0;
+}
+.wh-input:focus { background: white; outline: 2px solid var(--rose-300); outline-offset: -2px; border-radius: 4px; }
+.wh-date { font-size: 11px; color: var(--text-secondary); }
+
+/* ===== TOAST ===== */
+.toast {
+  position: fixed; bottom: 24px; right: 24px;
+  background: var(--text); color: white; padding: 12px 20px;
+  border-radius: 12px; font-size: 13px; font-weight: 500;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2); z-index: 200;
+  transform: translateY(100px); opacity: 0; transition: all 0.3s;
+  display: flex; align-items: center; gap: 8px;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+
+/* ===== DEMO BANNER ===== */
+.demo-banner {
+  background: linear-gradient(90deg, var(--rose-100), var(--rose-50));
+  border: 1px solid var(--rose-200); border-radius: var(--radius-sm);
+  padding: 10px 18px; margin-bottom: 14px;
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 12px; color: var(--rose-700); font-weight: 500;
+}
+.demo-banner-left { display: flex; align-items: center; gap: 6px; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1100px) {
+  .summary-grid { grid-template-columns: 1fr 1fr; }
+  .main { padding: 16px; }
+  .top-nav { padding: 12px 16px; }
+}
+@media (max-width: 768px) {
+  .top-nav-tabs { display: none; }
+  .search-box { width: 160px; }
+  .summary-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .sc-value { font-size: 22px; }
+  .summary-card { padding: 14px 16px; }
+  .tc-header { padding: 14px 16px; }
+  table { min-width: 0; }
+  .col-e, .col-f, .col-g { display: none; }
+  thead th { padding: 8px 10px; font-size: 9.5px; }
+  tbody td { padding: 7px 10px; font-size: 12.5px; }
+  .cost-footer { grid-template-columns: 1fr; }
+  .cost-footer-item { border-right: none; border-bottom: 1px solid var(--rose-100); padding: 12px 16px; }
+  .cost-footer-item:last-child { border-bottom: none; }
+  .toolbar { flex-direction: column; align-items: stretch; }
+  .toolbar-left { flex-wrap: wrap; }
+}
+@media (max-width: 480px) {
+  .summary-grid { grid-template-columns: 1fr; }
+  .search-box { width: 120px; }
+  .top-nav h1 { font-size: 15px; }
+  .main { padding: 10px; }
+  .dessert-name-input { font-size: 15px; max-width: 130px; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="top-nav">
+  <div class="top-nav-left">
+    <div class="logo-icon">🍰</div>
+    <h1>Kalkulator Receptur</h1>
+  </div>
+  <div class="top-nav-tabs">
+    <button class="top-nav-tab active" data-view="recipes" onclick="switchView('recipes')">Receptury</button>
+    <button class="top-nav-tab" data-view="warehouse" onclick="switchView('warehouse')">Magazyn cen</button>
+  </div>
+  <div class="top-nav-right">
+    <div class="search-box">
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" id="search-input" placeholder="Szukaj składnika lub deseru...">
+    </div>
+  </div>
+</nav>
+
+<div class="main">
+
+<!-- ==================== RECIPES VIEW ==================== -->
+<div class="view active" id="view-recipes">
+
+  <div class="summary-grid" id="summary-grid"></div>
+
+  <div class="demo-banner" id="demo-banner" style="display:none;">
+    <div class="demo-banner-left"><span>⚠️</span><span>Dane demonstracyjne (Jabłecznik & Brownie) — nie stanowią sprawdzonej receptury produkcyjnej.</span></div>
+    <button class="btn btn-xs btn-secondary" onclick="clearAllData()">Wyczyść i zacznij od zera</button>
+  </div>
+
+  <!-- DESSERT TABS SELECTOR (Apple / Google Sheets style tab bar) -->
+  <div class="dessert-tabs-container" id="dessert-tabs-container">
+    <div class="dessert-tabs-scroll" id="dessert-tabs-scroll">
+      <!-- Generated by JS -->
+    </div>
+    <div class="dessert-dropdown-wrap">
+      <select class="dessert-select-box" id="dessert-select-box" onchange="selectDessert(parseInt(this.value))">
+        <!-- Generated by JS -->
+      </select>
+      <button class="dessert-tab-add" onclick="openModal('modal-dessert'); focusField('dessert-name-field');">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+        Nowy deser
+      </button>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <div class="toolbar-left">
+      <button class="btn btn-primary" onclick="openIngModal(activeDessertIdx)">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+        Dodaj składnik
+      </button>
+      <button class="btn btn-secondary" onclick="exportCSV()">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Eksport CSV
+      </button>
+      <button class="btn btn-plum" onclick="syncAllPrices()">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        Aktualizuj ceny z magazynu
+      </button>
+    </div>
+  </div>
+
+  <div id="desserts-container"></div>
+
+  <div class="empty-state" id="empty-state" style="display:none;">
+    <div class="empty-state-icon">🧁</div>
+    <h3>Brak receptur</h3>
+    <p>Dodaj swój pierwszy deser, aby rozpocząć kalkulację kosztów.</p>
+    <button class="btn btn-primary" onclick="openModal('modal-dessert'); focusField('dessert-name-field');">
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+      Dodaj pierwszy deser
+    </button>
+  </div>
+
+</div>
+
+<!-- ==================== WAREHOUSE VIEW ==================== -->
+<div class="view" id="view-warehouse">
+
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px;">
+    <div>
+      <h2 style="font-size:22px;font-weight:800;margin-bottom:4px;">Magazyn produktów i cen</h2>
+      <p style="font-size:13px;color:var(--text-secondary);">Zarządzaj cenami w jednym miejscu. Zmiana ceny tutaj pozwala zaktualizować wszystkie receptury jednym kliknięciem.</p>
+    </div>
+    <button class="btn btn-primary" onclick="openModal('modal-warehouse'); focusField('wh-name-field');">
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+      Dodaj produkt
+    </button>
+  </div>
+
+  <div class="table-card">
+    <div class="table-scroll">
+      <table class="wh-table" id="wh-table-el">
+        <thead>
+          <tr>
+            <th style="width:40px">#</th>
+            <th style="min-width:200px">Nazwa produktu</th>
+            <th style="width:120px">Cena (zł)</th>
+            <th style="width:100px">Opakowanie</th>
+            <th style="width:80px">Jednostka</th>
+            <th style="width:130px">Aktualizacja</th>
+            <th style="width:40px"></th>
+          </tr>
+        </thead>
+        <tbody id="wh-tbody"></tbody>
+      </table>
+    </div>
+    <div id="wh-empty" style="text-align:center;padding:48px;color:var(--text-secondary);display:none;">
+      <p style="font-size:40px;margin-bottom:12px;">📦</p>
+      <p style="font-weight:600;">Magazyn jest pusty</p>
+      <p style="font-size:13px;margin-top:4px;">Dodaj produkty, aby zarządzać cenami globalnie.</p>
+    </div>
+  </div>
+
+</div>
+
+</div>
+
+<!-- ===== MODALS ===== -->
+
+<!-- Add dessert -->
+<div class="modal-overlay" id="modal-dessert">
+  <div class="modal">
+    <h2>🍰 Nowy deser</h2>
+    <div class="modal-field"><label>Nazwa deseru</label><input type="text" id="dessert-name-field" placeholder="np. Brownie czekoladowe, Tiramisu..."></div>
+    <div class="modal-field"><label>Planowana produkcja (g)</label><input type="number" id="dessert-prod-field" value="1000" min="1"></div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('modal-dessert')">Anuluj</button>
+      <button class="btn btn-primary" onclick="confirmAddDessert()">Dodaj deser</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add ingredient -->
+<div class="modal-overlay" id="modal-ingredient">
+  <div class="modal">
+    <h2>🧈 Nowy składnik</h2>
+    <div class="modal-field" id="wh-suggest-wrap">
+      <label>Nazwa składnika</label>
+      <input type="text" id="ing-name-field" placeholder="Zacznij pisać, aby wyszukać w magazynie..." autocomplete="off">
+      <div id="wh-suggestions" style="display:none;position:absolute;background:white;border:1px solid var(--border);border-radius:8px;box-shadow:var(--shadow-md);max-height:180px;overflow-y:auto;z-index:10;width:100%;margin-top:2px;"></div>
+    </div>
+    <div class="modal-row">
+      <div class="modal-field"><label>Ilość na 100 g deseru</label><input type="number" id="ing-base-field" step="0.01" min="0" placeholder="np. 35"></div>
+      <div class="modal-field"><label>Jednostka bazowa</label>
+        <select id="ing-unit-field"><option value="g">gramy (g)</option><option value="ml">mililitry (ml)</option><option value="szt.">sztuki (szt.)</option></select>
+      </div>
+    </div>
+    <div class="modal-row">
+      <div class="modal-field"><label>Cena zakupu (zł)</label><input type="number" id="ing-price-field" step="0.01" min="0" placeholder="np. 4.80"></div>
+      <div class="modal-field"><label>Wielkość opakowania</label><input type="number" id="ing-pkg-size-field" step="0.01" min="0" placeholder="np. 1"></div>
+    </div>
+    <div class="modal-field"><label>Jednostka opakowania</label>
+      <select id="ing-pkg-unit-field"><option value="kg">kg</option><option value="g">g</option><option value="l">l</option><option value="ml">ml</option><option value="szt.">szt.</option></select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('modal-ingredient')">Anuluj</button>
+      <button class="btn btn-primary" onclick="confirmAddIngredient()">Dodaj składnik</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add warehouse product -->
+<div class="modal-overlay" id="modal-warehouse">
+  <div class="modal">
+    <h2>📦 Nowy produkt w magazynie</h2>
+    <div class="modal-field"><label>Nazwa produktu</label><input type="text" id="wh-name-field" placeholder="np. Czekolada gorzka 70%"></div>
+    <div class="modal-row">
+      <div class="modal-field"><label>Cena (zł)</label><input type="number" id="wh-price-field" step="0.01" min="0" placeholder="np. 9.50"></div>
+      <div class="modal-field"><label>Wielkość opakowania</label><input type="number" id="wh-pkg-size-field" step="0.01" min="0" placeholder="np. 200"></div>
+    </div>
+    <div class="modal-field"><label>Jednostka opakowania</label>
+      <select id="wh-pkg-unit-field"><option value="g">g</option><option value="kg">kg</option><option value="l">l</option><option value="ml">ml</option><option value="szt.">szt.</option></select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('modal-warehouse')">Anuluj</button>
+      <button class="btn btn-primary" onclick="confirmAddWarehouse()">Dodaj do magazynu</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ========== UTILS ==========
+function toNum(v){const n=parseFloat(v);return isNaN(n)?0:n;}
+function fmt(v,d=2){return Number(v).toLocaleString('pl-PL',{minimumFractionDigits:0,maximumFractionDigits:d});}
+function fmtZ(v){return Number(v).toLocaleString('pl-PL',{minimumFractionDigits:2,maximumFractionDigits:2})+' zł';}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
+function today(){return new Date().toISOString().slice(0,10);}
+
+function toBase(amount,unit){
+  const u=unit.toLowerCase();
+  if(u==='kg')return amount*1000;
+  if(u==='l')return amount*1000;
+  return amount;
+}
+function baseOf(unit){
+  const u=unit.toLowerCase();
+  if(u==='kg'||u==='g')return 'g';
+  if(u==='l'||u==='ml')return 'ml';
+  return 'szt.';
+}
+function smart(amount,bu){
+  if(bu==='g'&&Math.abs(amount)>=1000)return{v:amount/1000,u:'kg'};
+  if(bu==='ml'&&Math.abs(amount)>=1000)return{v:amount/1000,u:'l'};
+  return{v:amount,u:bu};
+}
+
+// ========== DATA ==========
+const SK_R='dessert-v4', SK_W='warehouse-v2', SK_ACTIVE='active-dessert-idx';
+let data=[], warehouse=[];
+let isDemo=false, curDessert=-1, activeDessertIdx=0;
+
+function load(){
+  try{data=JSON.parse(localStorage.getItem(SK_R))||[];}catch(e){data=[];}
+  try{warehouse=JSON.parse(localStorage.getItem(SK_W))||[];}catch(e){warehouse=[];}
+  const savedActive = localStorage.getItem(SK_ACTIVE);
+  if(savedActive !== null) activeDessertIdx = parseInt(savedActive) || 0;
+}
+function save(){
+  localStorage.setItem(SK_R,JSON.stringify(data));
+  localStorage.setItem(SK_W,JSON.stringify(warehouse));
+  localStorage.setItem(SK_ACTIVE, activeDessertIdx.toString());
+}
+
+function demoData(){
+  return [
+    {
+      name: 'Jabłecznik',
+      production: 2400,
+      ingredients: [
+        {name:'Mąka pszenna',base:35,unitBase:'g',price:4.80,pkgSize:1,pkgUnit:'kg'},
+        {name:'Jabłka',base:50,unitBase:'g',price:6.00,pkgSize:1,pkgUnit:'kg'},
+        {name:'Cukier',base:20,unitBase:'g',price:3.50,pkgSize:1,pkgUnit:'kg'},
+        {name:'Masło',base:30,unitBase:'g',price:12.00,pkgSize:200,pkgUnit:'g'},
+        {name:'Jajka',base:10,unitBase:'g',price:8.40,pkgSize:10,pkgUnit:'szt.'},
+      ]
+    },
+    {
+      name: 'Brownie czekoladowe',
+      production: 1800,
+      ingredients: [
+        {name:'Czekolada gorzka 70%',base:30,unitBase:'g',price:9.50,pkgSize:200,pkgUnit:'g'},
+        {name:'Masło',base:25,unitBase:'g',price:12.00,pkgSize:200,pkgUnit:'g'},
+        {name:'Cukier trzcinowy',base:25,unitBase:'g',price:5.20,pkgSize:500,pkgUnit:'g'},
+        {name:'Jajka',base:15,unitBase:'g',price:8.40,pkgSize:10,pkgUnit:'szt.'},
+        {name:'Mąka pszenna',base:15,unitBase:'g',price:4.80,pkgSize:1,pkgUnit:'kg'},
+        {name:'Kakao ciemne',base:6,unitBase:'g',price:7.90,pkgSize:150,pkgUnit:'g'},
+      ]
+    }
+  ];
+}
+function demoWarehouse(){
+  return [
+    {id:uid(),name:'Mąka pszenna',price:4.80,pkgSize:1,pkgUnit:'kg',updated:today()},
+    {id:uid(),name:'Jabłka',price:6.00,pkgSize:1,pkgUnit:'kg',updated:today()},
+    {id:uid(),name:'Cukier',price:3.50,pkgSize:1,pkgUnit:'kg',updated:today()},
+    {id:uid(),name:'Masło',price:12.00,pkgSize:200,pkgUnit:'g',updated:today()},
+    {id:uid(),name:'Jajka',price:8.40,pkgSize:10,pkgUnit:'szt.',updated:today()},
+    {id:uid(),name:'Czekolada gorzka 70%',price:9.50,pkgSize:200,pkgUnit:'g',updated:today()},
+    {id:uid(),name:'Cukier trzcinowy',price:5.20,pkgSize:500,pkgUnit:'g',updated:today()},
+    {id:uid(),name:'Kakao ciemne',price:7.90,pkgSize:150,pkgUnit:'g',updated:today()}
+  ];
+}
+
+// ========== CALC ==========
+function calcNeeded(base,prod){return base*prod/100;}
+function calcCost(ing,prod){
+  const needed=calcNeeded(ing.base,prod);
+  const pkgB=toBase(ing.pkgSize,ing.pkgUnit);
+  if(pkgB===0)return null;
+  const ib=baseOf(ing.unitBase),pb=baseOf(ing.pkgUnit);
+  if(ib!==pb)return null;
+  return(ing.price/pkgB)*needed;
+}
+
+// ========== VIEW SWITCHING ==========
+function switchView(v){
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+  document.getElementById('view-'+v).classList.add('active');
+  document.querySelectorAll('.top-nav-tab').forEach(t=>{
+    t.classList.toggle('active',t.dataset.view===v);
+  });
+  if(v==='warehouse')renderWarehouse();
+}
+
+// ========== SELECT DESSERT TAB ==========
+function selectDessert(idx){
+  if(idx < 0 || idx >= data.length) return;
+  activeDessertIdx = idx;
+  save();
+  render();
+}
+
+// ========== RENDER SUMMARY ==========
+function renderSummary(){
+  const g=document.getElementById('summary-grid');
+  let nD=data.length,nI=0,tC=0,tP=0,ok=true;
+  data.forEach(d=>{
+    nI+=d.ingredients.length;
+    tP+=d.production;
+    d.ingredients.forEach(i=>{
+      const c=calcCost(i,d.production);
+      if(c!==null) tC+=c;
+      else ok=false;
+    });
+  });
+  g.innerHTML=`
+    <div class="summary-card"><div class="sc-label">Receptury</div><div class="sc-value">${nD}</div><div class="sc-sub">${nD===1?'deser':nD<5?'desery':'deserów'} w bazie</div></div>
+    <div class="summary-card"><div class="sc-label">Składniki</div><div class="sc-value">${nI}</div><div class="sc-sub">łącznie we wszystkich</div></div>
+    <div class="summary-card"><div class="sc-label">Produkcja łącznie</div><div class="sc-value">${fmt(tP/1000,1)} kg</div><div class="sc-sub">zaplanowana produkcja</div></div>
+    <div class="summary-card accent"><div class="sc-label">Łączny koszt receptur</div><div class="sc-value">${fmtZ(tC)}</div><div class="sc-sub">${ok?'wszystkie ceny kompletne':'⚠️ niekompletne dane'}</div></div>`;
+}
+
+// ========== RENDER RECIPES (ACTIVE TAB) ==========
+function render(){
+  renderSummary();
+  const c=document.getElementById('desserts-container');
+  const es=document.getElementById('empty-state');
+  const db=document.getElementById('demo-banner');
+  const tabsScroll=document.getElementById('dessert-tabs-scroll');
+  const tabsContainer=document.getElementById('dessert-tabs-container');
+  const selectBox=document.getElementById('dessert-select-box');
+
+  if(!data.length){
+    c.innerHTML='';
+    es.style.display='';
+    db.style.display='none';
+    tabsContainer.style.display='none';
+    return;
+  }
+  es.style.display='none';
+  tabsContainer.style.display='flex';
+  db.style.display=isDemo?'':'none';
+
+  if(activeDessertIdx >= data.length) activeDessertIdx = 0;
+  if(activeDessertIdx < 0) activeDessertIdx = 0;
+
+  const icons=['🍰','🍫','🧁','🍩','🍪','🎂','🍮','🧀','🥧','🍓'];
+
+  // Render Tabs & Dropdown
+  let tabsHtml = '';
+  let selectHtml = '';
+  data.forEach((d, i)=>{
+    const isActive = (i === activeDessertIdx);
+    const ic = icons[i % icons.length];
+    tabsHtml += `
+      <button class="dessert-tab-btn ${isActive?'active':''}" onclick="selectDessert(${i})">
+        <span>${ic}</span>
+        <span>${esc(d.name)}</span>
+        <span class="tab-badge">${d.ingredients.length}</span>
+      </button>
+    `;
+    selectHtml += `<option value="${i}" ${isActive?'selected':''}>${ic} ${esc(d.name)} (${d.ingredients.length} skł.)</option>`;
+  });
+  tabsScroll.innerHTML = tabsHtml;
+  selectBox.innerHTML = selectHtml;
+
+  // Active Dessert Render
+  const d = data[activeDessertIdx];
+  const di = activeDessertIdx;
+  const q = (document.getElementById('search-input').value||'').toLowerCase();
+
+  const show = q ? d.ingredients.filter(i => i.name.toLowerCase().includes(q) || d.name.toLowerCase().includes(q)) : d.ingredients;
+
+  let tCost=0, allOk=true;
+  d.ingredients.forEach(i=>{
+    const c=calcCost(i,d.production);
+    if(c!==null) tCost+=c;
+    else allOk=false;
+  });
+  const c100 = d.production > 0 ? (tCost * 100 / d.production) : 0;
+  const c1kg = c100 * 10;
+  const ic = icons[di % icons.length];
+
+  let h = `<div class="table-card">
+    <div class="tc-header">
+      <div class="tc-header-left">
+        <div class="dessert-icon">${ic}</div>
+        <input class="dessert-name-input" value="${esc(d.name)}" onchange="renameDessert(${di},this.value)" title="Kliknij, aby edytować nazwę">
+        <div class="prod-badge">
+          Planowana produkcja:
+          <input type="number" class="prod-input" value="${d.production}" min="0" onchange="changeProd(${di},this.value)" onfocus="this.select()"> g
+        </div>
+      </div>
+      <div class="tc-header-right">
+        <button class="btn btn-sm btn-primary" onclick="openIngModal(${di})">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Dodaj składnik
+        </button>
+        <button class="btn btn-sm btn-peach" onclick="dupeDessert(${di})" title="Kopiuj całą recepturę">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Kopiuj
+        </button>
+        <button class="btn btn-sm btn-danger" onclick="delDessert(${di})" title="Usuń ten deser">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg> Usuń
+        </button>
+      </div>
+    </div>
+    <div class="table-scroll"><table><thead><tr>
+      <th style="width:36px"><span class="col-letter">A</span>#</th>
+      <th style="min-width:180px"><span class="col-letter">B</span>Składnik</th>
+      <th style="width:110px"><span class="col-letter">C</span>Na 100 g</th>
+      <th style="width:120px"><span class="col-letter">D</span>Potrzebne</th>
+      <th class="col-e" style="width:110px"><span class="col-letter">E</span>Jednostka</th>
+      <th class="col-f" style="width:110px"><span class="col-letter">F</span>Cena (zł)</th>
+      <th class="col-g" style="width:140px"><span class="col-letter">G</span>Opakowanie</th>
+      <th style="width:120px"><span class="col-letter">H</span>Koszt</th>
+      <th style="width:36px"></th>
+    </tr></thead><tbody>`;
+
+  if(!show.length){
+    h+=`<tr><td colspan="9" style="text-align:center;padding:34px;color:var(--text-secondary);font-size:13.5px;">Brak składników w tym deserze — kliknij <strong>„+ Dodaj składnik"</strong> powyżej.</td></tr>`;
+  }
+
+  show.forEach(ing=>{
+    const ri = d.ingredients.indexOf(ing);
+    const need = calcNeeded(ing.base, d.production);
+    const cv = smart(need, ing.unitBase);
+    const cost = calcCost(ing, d.production);
+    const cs = cost !== null ? fmtZ(cost) : '—';
+    h+=`<tr>
+      <td class="row-num">${ri+1}</td>
+      <td class="cell-editable"><input class="cell-input" value="${esc(ing.name)}" onchange="upIng(${di},${ri},'name',this.value)"></td>
+      <td class="cell-editable"><input class="cell-input num" type="number" step="0.01" value="${ing.base}" onchange="upIng(${di},${ri},'base',this.value)" onfocus="this.select()"></td>
+      <td class="cell-readonly">${fmt(need)}<span class="cell-unit">${ing.unitBase}</span></td>
+      <td class="col-e cell-readonly">${fmt(cv.v,3)}<span class="cell-unit">${cv.u}</span></td>
+      <td class="col-f cell-editable"><input class="cell-input num" type="number" step="0.01" value="${ing.price}" onchange="upIng(${di},${ri},'price',this.value)" onfocus="this.select()"></td>
+      <td class="col-g cell-editable" style="display:flex;align-items:center;gap:4px;">
+        <input class="cell-input num" type="number" step="0.01" style="width:58px" value="${ing.pkgSize}" onchange="upIng(${di},${ri},'pkgSize',this.value)" onfocus="this.select()">
+        <select class="unit-select" onchange="upIng(${di},${ri},'pkgUnit',this.value)">
+          ${['kg','g','l','ml','szt.'].map(u=>`<option value="${u}"${ing.pkgUnit===u?' selected':''}>${u}</option>`).join('')}
+        </select>
+      </td>
+      <td class="cell-cost">${cs}</td>
+      <td><button class="del-btn" onclick="delIng(${di},${ri})" title="Usuń składnik"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button></td>
+    </tr>`;
+  });
+
+  h+=`</tbody></table></div>
+  <div class="cost-footer">
+    <div class="cost-footer-item"><div class="cf-label">Koszt całego deseru (${esc(d.name)})</div><div class="cf-value">${fmtZ(tCost)}</div><div class="cf-sub">${fmt(d.production)} g zaplanowanej produkcji</div></div>
+    <div class="cost-footer-item"><div class="cf-label">Koszt 100 g</div><div class="cf-value">${fmtZ(c100)}</div><div class="cf-sub">koszt jednostkowy porcji</div></div>
+    <div class="cost-footer-item"><div class="cf-label">Koszt 1 kg</div><div class="cf-value">${fmtZ(c1kg)}</div><div class="cf-sub">za kilogram gotowego wyrobu</div></div>
+  </div></div>`;
+
+  c.innerHTML = h;
+}
+
+// ========== RENDER WAREHOUSE ==========
+function renderWarehouse(){
+  const tb=document.getElementById('wh-tbody');
+  const em=document.getElementById('wh-empty');
+  if(!warehouse.length){tb.innerHTML='';em.style.display='';return;}
+  em.style.display='none';
+  let h='';
+  warehouse.forEach((p,i)=>{
+    h+=`<tr>
+      <td style="color:var(--text-secondary);font-size:12px;">${i+1}</td>
+      <td><input class="wh-input" value="${esc(p.name)}" onchange="upWh(${i},'name',this.value)"></td>
+      <td><input class="wh-input" type="number" step="0.01" style="text-align:right;font-weight:600;" value="${p.price}" onchange="upWh(${i},'price',this.value)" onfocus="this.select()"></td>
+      <td><input class="wh-input" type="number" step="0.01" style="text-align:right;width:60px;" value="${p.pkgSize}" onchange="upWh(${i},'pkgSize',this.value)" onfocus="this.select()"></td>
+      <td><select class="unit-select" onchange="upWh(${i},'pkgUnit',this.value)">
+        ${['kg','g','l','ml','szt.'].map(u=>`<option value="${u}"${p.pkgUnit===u?' selected':''}>${u}</option>`).join('')}
+      </select></td>
+      <td><span class="wh-date">${p.updated||'—'}</span></td>
+      <td><button class="del-btn" style="opacity:1" onclick="delWh(${i})"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button></td>
+    </tr>`;
+  });
+  tb.innerHTML=h;
+}
+
+// ========== ACTIONS: RECIPES ==========
+function confirmAddDessert(){
+  const n=document.getElementById('dessert-name-field').value.trim();
+  if(!n){toast('⚠️ Podaj nazwę deseru');return;}
+  const p=toNum(document.getElementById('dessert-prod-field').value)||1000;
+  data.push({name:n,production:p,ingredients:[]});
+  activeDessertIdx = data.length - 1; // switch to newly created tab
+  save();render();closeModal('modal-dessert');toast('✅ Utworzono zakładkę: '+n);
+}
+function openIngModal(di){
+  if(di === undefined || di < 0) di = activeDessertIdx;
+  curDessert=di;
+  ['ing-name-field','ing-base-field','ing-price-field','ing-pkg-size-field'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('ing-unit-field').value='g';
+  document.getElementById('ing-pkg-unit-field').value='kg';
+  openModal('modal-ingredient');focusField('ing-name-field');
+}
+function confirmAddIngredient(){
+  const n=document.getElementById('ing-name-field').value.trim();
+  if(!n){toast('⚠️ Podaj nazwę składnika');return;}
+  const b=toNum(document.getElementById('ing-base-field').value);
+  const ub=document.getElementById('ing-unit-field').value;
+  const pr=toNum(document.getElementById('ing-price-field').value);
+  const ps=toNum(document.getElementById('ing-pkg-size-field').value)||1;
+  const pu=document.getElementById('ing-pkg-unit-field').value;
+  data[curDessert].ingredients.push({name:n,base:b,unitBase:ub,price:pr,pkgSize:ps,pkgUnit:pu});
+  // Also add to warehouse if not exists
+  if(!warehouse.find(w=>w.name.toLowerCase()===n.toLowerCase())){
+    warehouse.push({id:uid(),name:n,price:pr,pkgSize:ps,pkgUnit:pu,updated:today()});
+  }
+  save();render();closeModal('modal-ingredient');toast('✅ Dodano składnik: '+n);
+}
+function upIng(di,ii,k,v){
+  if(['base','price','pkgSize'].includes(k))v=toNum(v);
+  data[di].ingredients[ii][k]=v;
+  save();render();
+}
+function changeProd(di,v){data[di].production=toNum(v);save();render();}
+function renameDessert(di,v){data[di].name=v.trim()||data[di].name;save();render();}
+function delDessert(di){
+  if(!confirm('Usunąć deser „'+data[di].name+'" wraz ze wszystkimi składnikami?'))return;
+  data.splice(di,1);
+  if(activeDessertIdx >= data.length) activeDessertIdx = Math.max(0, data.length - 1);
+  save();render();toast('🗑️ Deser usunięty');
+}
+function delIng(di,ii){
+  if(!confirm('Usunąć składnik „'+data[di].ingredients[ii].name+'"?'))return;
+  data[di].ingredients.splice(ii,1);save();render();
+}
+function dupeDessert(di){
+  const cp=JSON.parse(JSON.stringify(data[di]));
+  cp.name+=' (kopia)';
+  data.splice(di+1,0,cp);
+  activeDessertIdx = di + 1;
+  save();render();toast('📋 Skopiowano recepturę do nowej zakładki');
+}
+function clearAllData(){
+  if(!confirm('Usunąć wszystkie dane i zacząć od zera?'))return;
+  data=[];warehouse=[];isDemo=false;activeDessertIdx=0;save();render();
+}
+
+// ========== ACTIONS: WAREHOUSE ==========
+function confirmAddWarehouse(){
+  const n=document.getElementById('wh-name-field').value.trim();
+  if(!n){toast('⚠️ Podaj nazwę produktu');return;}
+  const pr=toNum(document.getElementById('wh-price-field').value);
+  const ps=toNum(document.getElementById('wh-pkg-size-field').value)||1;
+  const pu=document.getElementById('wh-pkg-unit-field').value;
+  warehouse.push({id:uid(),name:n,price:pr,pkgSize:ps,pkgUnit:pu,updated:today()});
+  save();renderWarehouse();closeModal('modal-warehouse');toast('✅ Dodano do magazynu: '+n);
+}
+function upWh(i,k,v){
+  if(['price','pkgSize'].includes(k))v=toNum(v);
+  warehouse[i][k]=v;
+  warehouse[i].updated=today();
+  save();renderWarehouse();
+}
+function delWh(i){
+  if(!confirm('Usunąć „'+warehouse[i].name+'" z magazynu?'))return;
+  warehouse.splice(i,1);save();renderWarehouse();toast('🗑️ Produkt usunięty z magazynu');
+}
+
+// Sync prices from warehouse to all recipes
+function syncAllPrices(){
+  let count=0;
+  data.forEach(d=>{
+    d.ingredients.forEach(ing=>{
+      const wh=warehouse.find(w=>w.name.toLowerCase()===ing.name.toLowerCase());
+      if(wh){
+        if(ing.price!==wh.price||ing.pkgSize!==wh.pkgSize||ing.pkgUnit!==wh.pkgUnit){
+          ing.price=wh.price; ing.pkgSize=wh.pkgSize; ing.pkgUnit=wh.pkgUnit;
+          count++;
+        }
+      }
+    });
+  });
+  save();render();
+  if(count>0)toast('🔄 Zaktualizowano ceny: '+count+' składników');
+  else toast('✅ Wszystkie ceny są aktualne');
+}
+
+// ========== INGREDIENT AUTOCOMPLETE FROM WAREHOUSE ==========
+(function(){
+  const inp=document.getElementById('ing-name-field');
+  const box=document.getElementById('wh-suggestions');
+  inp.addEventListener('input',()=>{
+    const q=inp.value.toLowerCase().trim();
+    if(!q||!warehouse.length){box.style.display='none';return;}
+    const matches=warehouse.filter(w=>w.name.toLowerCase().includes(q));
+    if(!matches.length){box.style.display='none';return;}
+    box.innerHTML=matches.map((w,i)=>`<div style="padding:8px 14px;cursor:pointer;font-size:13px;border-bottom:1px solid var(--border-light);display:flex;justify-content:space-between;align-items:center;" onmousedown="pickWh(${warehouse.indexOf(w)})">
+      <span>${esc(w.name)}</span>
+      <span style="color:var(--text-secondary);font-size:11px;">${w.price} zł / ${w.pkgSize} ${w.pkgUnit}</span>
+    </div>`).join('');
+    box.style.display='block';
+  });
+  inp.addEventListener('blur',()=>setTimeout(()=>box.style.display='none',200));
+})();
+function pickWh(i){
+  const w=warehouse[i];
+  document.getElementById('ing-name-field').value=w.name;
+  document.getElementById('ing-price-field').value=w.price;
+  document.getElementById('ing-pkg-size-field').value=w.pkgSize;
+  document.getElementById('ing-pkg-unit-field').value=w.pkgUnit;
+  document.getElementById('wh-suggestions').style.display='none';
+}
+
+// ========== EXPORT ==========
+function exportCSV(){
+  let rows=[['Deser','Składnik','Na 100g','Jednostka','Produkcja (g)','Potrzebne','Cena (zł)','Opakowanie','Koszt (zł)','Koszt 100g','Koszt 1kg']];
+  data.forEach(d=>{
+    let tC=0;
+    d.ingredients.forEach(i=>{const c=calcCost(i,d.production);if(c!==null)tC+=c;});
+    const c100=d.production>0?tC*100/d.production:0;
+    d.ingredients.forEach(ing=>{
+      const need=calcNeeded(ing.base,d.production);
+      const cost=calcCost(ing,d.production);
+      rows.push([d.name,ing.name,ing.base,ing.unitBase,d.production,need.toFixed(2),ing.price,`${ing.pkgSize} ${ing.pkgUnit}`,cost!==null?cost.toFixed(2):'',c100.toFixed(2),(c100*10).toFixed(2)]);
+    });
+  });
+  const csv=rows.map(r=>r.map(v=>`"${v}"`).join(',')).join('\n');
+  const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download='receptury.csv';a.click();
+  URL.revokeObjectURL(url);toast('📥 Wyeksportowano CSV');
+}
+
+// ========== MODALS ==========
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+function focusField(id){setTimeout(()=>document.getElementById(id).focus(),120);}
+document.querySelectorAll('.modal-overlay').forEach(el=>{
+  el.addEventListener('click',e=>{if(e.target===el)closeModal(el.id);});
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape')document.querySelectorAll('.modal-overlay.open').forEach(m=>closeModal(m.id));
+  if(e.key==='Enter'){
+    const dm=document.getElementById('modal-dessert');
+    const im=document.getElementById('modal-ingredient');
+    const wm=document.getElementById('modal-warehouse');
+    if(dm.classList.contains('open'))confirmAddDessert();
+    else if(im.classList.contains('open'))confirmAddIngredient();
+    else if(wm.classList.contains('open'))confirmAddWarehouse();
+  }
+});
+
+// ========== TOAST ==========
+let toastT;
+function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('show'),2500);}
+
+// ========== SEARCH ==========
+document.getElementById('search-input').addEventListener('input',()=>render());
+
+// ========== INIT ==========
+document.addEventListener('DOMContentLoaded',()=>{
+  load();
+  if(!data.length&&!warehouse.length){
+    data=demoData();warehouse=demoWarehouse();isDemo=true;
+  }
+  render();
+});
+</script>
+</body>
+</html>
