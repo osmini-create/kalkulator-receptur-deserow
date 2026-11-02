@@ -381,6 +381,38 @@ tbody td {
 tbody tr:hover .del-btn { opacity: 1; }
 .del-btn:hover { background: #fef2f2; }
 
+/* Order buttons for ingredients and desserts */
+.order-btn {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 5px;
+  font-size: 10px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  line-height: 1.2;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.order-btn:hover:not(:disabled) {
+  background: var(--rose-100);
+  color: var(--rose-700);
+  border-color: var(--rose-300);
+}
+.order-btn:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+}
+.row-num-cell {
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 500;
+  text-align: center;
+  white-space: nowrap;
+}
+
 /* ===== COST FOOTER ===== */
 .cost-footer {
   display: grid; grid-template-columns: repeat(3, 1fr); gap: 0;
@@ -1013,6 +1045,13 @@ tbody tr:hover .del-btn { opacity: 1; }
       <label>Planowana produkcja (g)</label>
       <input type="number" id="edit-dessert-prod" min="1">
     </div>
+    <div class="modal-field">
+      <label>Kolejność w menu przepisów</label>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <button class="btn btn-sm btn-secondary" type="button" onclick="moveCurrentEditingDessert(-1)">◀ Przesuń w lewo (wcześniej)</button>
+        <button class="btn btn-sm btn-secondary" type="button" onclick="moveCurrentEditingDessert(1)">▶ Przesuń w prawo (później)</button>
+      </div>
+    </div>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-top:20px;">
       <button class="btn btn-danger btn-sm" onclick="deleteFromEditModal()">
         🗑️ Usuń ten przepis
@@ -1636,7 +1675,13 @@ function render(){
         <button class="btn btn-sm btn-primary" onclick="openIngModal(${di})">
           <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Dodaj składnik
         </button>
-        <button class="btn btn-sm btn-secondary" onclick="openEditDessertModal(${di})" title="Zmień kategorię, nazwę lub produkcję">
+        <button class="btn btn-sm btn-secondary" onclick="moveDessert(${di},-1)" ${di===0?'disabled':''} title="Przesuń ten przepis wcześniej (w lewo)">
+          ◀
+        </button>
+        <button class="btn btn-sm btn-secondary" onclick="moveDessert(${di},1)" ${di===data.length-1?'disabled':''} title="Przesuń ten przepis później (w prawo)">
+          ▶
+        </button>
+        <button class="btn btn-sm btn-secondary" onclick="openEditDessertModal(${di})" title="Zmień kategorię, nazwę, kolejność lub produkcję">
           ✏️ Edytuj
         </button>
         <button class="btn btn-sm btn-peach" onclick="dupeDessert(${di})" title="Kopiuj całą recepturę">
@@ -1648,7 +1693,7 @@ function render(){
       </div>
     </div>
     <div class="table-scroll"><table><thead><tr>
-      <th style="width:36px"><span class="col-letter">A</span>#</th>
+      <th style="width:75px"><span class="col-letter">A</span># / Kol.</th>
       <th style="min-width:180px"><span class="col-letter">B</span>Składnik</th>
       <th style="width:110px"><span class="col-letter">C</span>Na 100 g</th>
       <th style="width:120px"><span class="col-letter">D</span>Potrzebne</th>
@@ -2147,6 +2192,49 @@ function upIng(di,ii,k,v){
 }
 function changeProd(di,v){data[di].production=toNum(v);save();render();}
 function renameDessert(di,v){data[di].name=v.trim()||data[di].name;save();render();}
+
+
+// ========== REORDER FUNCTIONS (DESERY & SKŁADNIKI) ==========
+function moveDessert(di, direction){
+  const targetIdx = di + direction;
+  if(targetIdx < 0 || targetIdx >= data.length) return;
+
+  const temp = data[di];
+  data[di] = data[targetIdx];
+  data[targetIdx] = temp;
+
+  activeDessertIdx = targetIdx;
+  save();
+  render();
+  toast('↔️ Zmieniono kolejność przepisów');
+}
+
+function moveCurrentEditingDessert(direction){
+  const di = parseInt(document.getElementById('edit-dessert-idx').value);
+  if(isNaN(di) || di < 0 || di >= data.length) return;
+  const targetIdx = di + direction;
+  if(targetIdx < 0 || targetIdx >= data.length){
+    toast('Osiągnięto początek/koniec listy');
+    return;
+  }
+  moveDessert(di, direction);
+  document.getElementById('edit-dessert-idx').value = targetIdx;
+}
+
+function moveIngredient(di, ii, direction){
+  const d = data[di];
+  if(!d || !d.ingredients) return;
+  const targetIdx = ii + direction;
+  if(targetIdx < 0 || targetIdx >= d.ingredients.length) return;
+
+  const temp = d.ingredients[ii];
+  d.ingredients[ii] = d.ingredients[targetIdx];
+  d.ingredients[targetIdx] = temp;
+
+  save();
+  render();
+  toast('↕️ Zmieniono kolejność składników');
+}
 
 function delDessert(di){
   if(!confirm('Usunąć przepis „'+data[di].name+'" wraz ze wszystkimi składnikami?'))return;
